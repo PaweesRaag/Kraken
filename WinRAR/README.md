@@ -1,4 +1,4 @@
-_# ⚔️ WINRAR Cracking Adventure
+# ⚔️ WINRAR Cracking Adventure
 
 > **Well hello there!!!**  
 > Back to another cracking adventure, and this time — it’s the LEGENDARY **WINRARRRRR!!!**
