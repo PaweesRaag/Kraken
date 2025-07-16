@@ -13,8 +13,14 @@
 
 ## 🔍 Recon and Enumeration
 
-We’ve got the installer. Install the app, right-clicking through all the suggestions as we go.  
-Let’s start the app — **\*NAG\***. Close it. Open it again — **\*NAG\*** again. Close it again.
+We’ve got the installer. Install the app,
+<br><img width="498" height="639" alt="Screenshot 2025-07-16 162752" src="https://github.com/user-attachments/assets/279fa824-3291-4502-8c01-ae4b07428971" />
+
+right-clicking through all the suggestions as we go.  
+Let’s start the app — **\*NAG\***.
+<br><img width="311" height="158" alt="Screenshot 2025-07-16 162917" src="https://github.com/user-attachments/assets/30df994e-28ce-4c39-a9fc-9e556f50c13e" />
+
+Close it. Open it again — **\*NAG\*** again. Close it again.
 
 Let’s investigate.
 
@@ -160,6 +166,8 @@ Make the message handler **skip** the WM_TIMER case completely.
    ```
    0043F79E  JNZ SHORT WinRAR.0043F81D
    ```
+   <br><img width="670" height="151" alt="Screenshot 2025-07-16 163208" src="https://github.com/user-attachments/assets/fdd008c4-2c70-4a1c-a7f4-ac7d19ca27d1" />
+
 
 2. Press **Spacebar** on the line.
 
