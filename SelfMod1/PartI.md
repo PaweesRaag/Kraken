@@ -4,7 +4,8 @@
 
 ## 🛠 Enum and Recon
 
-![image](<image-placeholder>)
+<img width="298" height="263" alt="Screenshot 2025-08-11 111623" src="https://github.com/user-attachments/assets/eec9922a-df46-43ab-b849-a5dc50e8e318" />
+
 
 Let's lock and load the crackme in our **OLLY**.  
 Hmm, interesting 🤔 — no display for the input.  
@@ -53,7 +54,8 @@ Looking back at the disassembly, we can see this address:
 
 ## 📍 Main Dialog Callback Message Handler
 
-![image](<image-placeholder>)
+<img width="556" height="270" alt="Screenshot 2025-08-11 111851" src="https://github.com/user-attachments/assets/84f666b4-11ff-49aa-9555-d3c0a3767e40" />
+
 
 This is a fairly normal-looking `DlgProc`.  
 Usually, it’s a **big switch statement**, though in assembly it becomes a **big if/then block**.
@@ -66,7 +68,6 @@ Essentially, it's checking the message ID sent with the `DLGProc` window against
 
 ### Running the App
 
-![image](<image-placeholder>)
 
 Playing with it, look for some *unusualities* —  
 For example, the **Clear** button doesn’t work. Why? Nobody knows.
