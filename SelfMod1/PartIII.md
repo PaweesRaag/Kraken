@@ -1,4 +1,4 @@
-# Part-III (If the password entered is wrong enter another and another and another Million Times until it's gaped open)
+# Part-3 (If the password entered is wrong enter another and another and another Million Times until it's gaped open)
 
 > "It's time to cook"
 
