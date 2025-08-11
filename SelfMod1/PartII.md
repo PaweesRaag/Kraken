@@ -1,4 +1,4 @@
-# PART -II
+# PART - 2
 ## <br>MUCH BETTER (*CRACKING THE KNUCKLES*) It's patching time
 
 In part two of this three part series we will go over self-modifying code and will eventually crack this binary. As promised, it will be challenging, but don’t worry if you don’t get everything- a lot is specific to this binary and you may never see again. But still we might need to remember until we meet again.
@@ -16,7 +16,7 @@ Any other messages are ignored.
 
 We’ve already gone through the init dialog code, and we don’t really care about the destroy window code, as that’s only called when we close the app. Therefore, anything worth noting happens in the **WM_COMMAND** section.
 
-So let’s only pause Olly in that section. Remove any old breakpoints and set a new one at address `40108E`, or after the compare/jump for ID `111`, and run the app.
+So let’s only pause Olly in that section. Remove any old breakpoints and set a new one at address `40108E`, or after :the compare/jump for ID `111`, and run the app.
 
 You will notice that now if you move the mouse over the window, resize it, move it, or do anything that doesn’t involve clicking a button, Olly continues to run, as all of these messages are ignored.
 
@@ -24,13 +24,15 @@ Now click on the first button, `'1'`.
 
 Olly breaks at our breakpoint. We can also see that the `ARG.3` variable contains `'65'`
 
-![image]
+<img width="228" height="133" alt="Screenshot 2025-08-11 112631" src="https://github.com/user-attachments/assets/66075b2e-c35a-48ea-8411-0efa7feb2ce9" />
+
 
 <br>
 
 If we were to open our crackme in **Resource Hacker** (from the last tutorial) and open up the main dialog, you would see that `65` (or `101` in decimal) is the ID for the number **'1'** button:
 
-![image]
+<img width="726" height="483" alt="Screenshot 2025-08-11 112700" src="https://github.com/user-attachments/assets/d8b3be21-a9d4-42bc-ad5a-a2dde7c45124" />
+
 
 <br>
 
@@ -145,7 +147,8 @@ Next we compare memory location `403048` (which is zero) with `3` (we don’t kn
 
 You may also have noticed the `JNB` at address `4011F9` that points to the brute-force message. Obviously, location `403048` will have some sort of counter in it, and if it gets above 3 we will get the brute-force message.
 
-![image]
+<img width="579" height="388" alt="Screenshot 2025-08-11 112800" src="https://github.com/user-attachments/assets/210aa3bc-1b1f-4cea-b7e4-e218a088f10d" />
+
 
 ---
 
@@ -164,7 +167,8 @@ Here, we increment the counter at `403044`, move the new variables back into the
 
 Stepping once jumps to the end of our main loop:
 
-![image]
+<img width="609" height="372" alt="Screenshot 2025-08-11 112959" src="https://github.com/user-attachments/assets/4b46be11-0d73-4bca-898b-2dd189bca8f9" />
+
 
 Where we compare `403048` (which is still zero) and jump to the brute force message if it’s greater than `3`.
 
@@ -212,7 +216,8 @@ We know that we get to this code by clicking at least `0x0A` (10) buttons.
 
 So let’s place a **breakpoint (BP)** at address `401204`, clear our other breakpoints, and re-start the app (so we can count off 10 button presses):
 
-![image]
+<img width="578" height="193" alt="Screenshot 2025-08-11 113101" src="https://github.com/user-attachments/assets/2e622882-da3f-4599-a522-c3686d2c0db6" />
+
 
 ---
 
@@ -275,11 +280,12 @@ Here’s what this almost certainly indicates:
 - OllyDbg or any other debugger might show you dummy bytes until this memory is modified.  
 - After modification, the real code or logic will exist only at runtime.
 
-![image]
+<img width="439" height="395" alt="Screenshot 2025-08-11 113226" src="https://github.com/user-attachments/assets/f8747852-e83a-449a-9e42-fdd110135f4d" />
 
 Hmmmmm. That looks really suspicious. It doesn’t look like code at all. Let’s keep going and see what the app changes in this section of memory. Step just past the call to `VirtualProtect`:
 
-![image]
+<img width="460" height="247" alt="Screenshot 2025-08-11 113340" src="https://github.com/user-attachments/assets/f1dfabd8-7d05-4560-ba2f-f3a3308e4c1f" />
+
 
 Now, the first thing we do is move the contents of memory location `403038` into `EAX` and XOR it with memory location `401407`, storing the result back into address `401407`.
 
@@ -309,23 +315,19 @@ Going back to our current instruction, the next thing it does is compare the fir
 
 Looking at the above picture, we can see the opcode value at `401407` is `E3` which does not equal `52`, so we will jump. The jump is to another setup and call of `VirtualProtect`, this time locking that section of memory back to executable.
 
-![image]
+<img width="581" height="519" alt="Screenshot 2025-08-11 113622" src="https://github.com/user-attachments/assets/27198fc9-70db-46c5-83fb-24da65af4aed" />
+
 
 But before this, you may have noticed that memory location `401407` was XOR’ed again at address `40148F`.Looking again at address `401407` we see that it was changed again:
 
-![image]
+
 
 We then push a value (`F08E2`) into the stack and call another routine at address `401403`. Stepping in, we see that function:
 
-![image]
-
 Well, well, well. We have jumped to the area of memory that the app changed. We recognize the new `JMP` at address `401407`. Let’s step onto the jump and see where we go:
-
-![image]
 
 Odd, it is jumping to a return. So it appears this didn’t really do anything. We are now back at the main program:
 
-![image]
 
 The next thing we are going to do is reset our counter from `0x0A` back to zero. We will then increment the counter for the brute force check by one.  
 Now we know how the brute force check works: if you enter a (wrong) 10-digit code more than 3 times, the contents of location `403048` will be above 3 and we will jump to the brute force message. If you want to try it, go ahead. Just remove the BP at address `401204` and enter in a 10-digit code three times.
@@ -374,6 +376,9 @@ if (memory[0x401407] != 0x52) // Validation
 One thing we can gather is that the compare with `0x52` at address `40146e` is pretty important.  
 It basically tells the program that the changes to the code that have been made are the correct changes.  
 
+<img width="587" height="330" alt="Screenshot 2025-08-11 113753" src="https://github.com/user-attachments/assets/b4fc347e-2344-4b5d-ba4d-6bd1ad117414" />
+
+
 But what does an opcode of `0x52` mean?  
 
 > After a rather lengthy Google search, I discovered that opcode `0x52` is **“PUSH EDX”**.  
@@ -386,12 +391,12 @@ So, this code checks to see if the first instruction is a **“PUSH EDX”**, an
 
 - Set a breakpoint (BP) at address `40146E` where the code checks for the push instruction and run the app.  
 - When we break at this address, go to address `401407` and change the value to `0x52`.
+<img width="573" height="250" alt="Screenshot 2025-08-11 113940" src="https://github.com/user-attachments/assets/d5d407f4-9363-4f8b-8331-36fa40b6b37c" />
 
 Also read:  
 - [Understanding Opcodes in Solidity](https://medium.com/@hardikksavaliya/understanding-opcodes-in-solidity-a-deep-dive-into-ethereums-low-level-operations-c2cbb4ab788a)  
 - [Alphanumeric Opcode Reference](https://nets.ec/Shellcode/Appendix/Alphanumeric_opcode)  
 
-![image]
 
 ---
 
@@ -404,7 +409,7 @@ Also read:
 
 After XORing it, we then have:
 
-![image]
+<img width="500" height="475" alt="Screenshot 2025-08-11 114511" src="https://github.com/user-attachments/assets/4c234055-a9b3-4f17-833d-051f932a5018" />
 
 ---
 
@@ -419,7 +424,8 @@ Highlight the modified section -> right-click -> Analysis
 
 # MUCH BETTER
 
-![image]
+<img width="553" height="472" alt="Screenshot 2025-08-11 115227" src="https://github.com/user-attachments/assets/bb5b0ca2-7f57-426b-952c-f0b65374ff49" />
+
 
 It looks like real code now! Well, except for that bit at the end that we created incorrectly.  
 From here, I'm gonna quote the author since I can't grasp it completely even now:
@@ -437,7 +443,8 @@ From here, I'm gonna quote the author since I can't grasp it completely even now
 > An experienced reverse engineer will probably remember that string **“An error occurred”** and think **“we never used that string. We saw that it was just a decoy and was never used. Maybe that is what will be decrypted…”**.  
 > Another hint that tells us that this is a viable solution is that the string is pushed onto the stack but is never used. Why? Here is a picture of the stack when we enter this code"
 
-![image]
+<img width="382" height="152" alt="Screenshot 2025-08-11 115310" src="https://github.com/user-attachments/assets/4fae0e49-3774-4cf1-aa49-cf5acda9ff02" />
+
 
 So assuming that we want to test our hypothesis, we want EDX to point to this string.  
 The easiest way would be to simply load EDX with the offset in memory that the **“An error occurred”** string is placed, namely address `403000`.  
@@ -590,6 +597,9 @@ LPCTSTR lpString // text to set
 int nIDDlgItem, // identifier of control
 HWND hDlg, // handle of dialog box
 ```
+
+**<img width="673" height="108" alt="Screenshot 2025-08-11 115750" src="https://github.com/user-attachments/assets/ee9f0814-bb39-4cfb-9b7b-2cddb274b9f9" />**
+
 So according to the logic first we will load the message to be displayed and then we shall load the arguments before calling the winAPI at `40143B` we shall push `[EBP+0xC]` we wont repeat the same mistake as earlier lol
 stack register
 ```assembly
@@ -601,12 +611,15 @@ stack register
 EBP=19F8C8 so `push EBP+0c` means pushing **"Access Granted"**
 As this is the pointer to our new text string. 
 <br>The second and last options are a little harder, but fortunately we have a reference. There is a  `SetGlgItemTextA` when the **bruteforce message** is displayed
-<image>
+<img width="673" height="108" alt="Screenshot 2025-08-11 115750" src="https://github.com/user-attachments/assets/f2713a35-45cf-4031-9178-48f109a070af" />
+
 We can see that the ControlID equals 3 and the handle to the window is 707AA. The control ID is easy:
 ```assembly
 PUSH 3
 ```
 The handle is a little harder, but looking at the stack again, it’s not that hard. The next one is a bit tricky. Fortunately, the handle is right on the stack:
+<img width="378" height="207" alt="Screenshot 2025-08-11 115817" src="https://github.com/user-attachments/assets/6ca0c1ab-1c38-48d8-a46e-e564e48ba241" />
+
 ```assembly
 PUSH DWORD PTR [EBP + 8]
 ```
@@ -618,5 +631,9 @@ Inserting our code now makes the disassembly look rather nice:
 00401443  |.  E8 78000000   CALL <JMP.&USER32.SetDlgItemTextA>       ; \SetDlgItemTextA
 ```
 Now press F9 and run boom "access granted"
+
+<img width="294" height="263" alt="Screenshot 2025-08-11 115837" src="https://github.com/user-attachments/assets/f8d86d31-5e8a-4ac9-992a-0d3f6575ab93" />
+
+
 # KISTIMAAT
 Now save the patched file
